@@ -29,12 +29,10 @@ type NaclGenerator struct {
 
 func (NaclGenerator) createResources(nacls *ec2.DescribeNetworkAclsOutput) []terraformutils.Resource {
 	resources := []terraformutils.Resource{}
-	var resourceType string
+	resourceType := "aws_network_acl"
 	for _, nacl := range nacls.NetworkAcls {
 		if nacl.IsDefault != nil && *nacl.IsDefault {
 			resourceType = "aws_default_network_acl"
-		} else {
-			resourceType = "aws_network_acl"
 		}
 		resources = append(resources, terraformutils.NewSimpleResource(
 			StringValue(nacl.NetworkAclId),

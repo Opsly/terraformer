@@ -17,12 +17,10 @@ func (g *QueryGenerator) InitResources() error {
 		return fmt.Errorf("unable to initialize Honeycomb client: %v", err)
 	}
 
+	ctx := context.TODO()
+
 	for _, dataset := range g.datasets {
-		if dataset.Slug == environmentWideDatasetSlug {
-			// environment-wide Triggers are not supported
-			continue
-		}
-		triggers, err := client.Triggers.List(context.TODO(), dataset.Slug)
+		triggers, err := client.Triggers.List(ctx, dataset.Slug)
 		if err != nil {
 			return fmt.Errorf("unable to list Honeycomb triggers for dataset %s: %v", dataset.Slug, err)
 		}
@@ -44,16 +42,13 @@ func (g *QueryGenerator) InitResources() error {
 
 	boards, err := client.Boards.List(context.TODO())
 	if err != nil {
-		return fmt.Errorf("unable to list Honeycomb boards: %v", err)
+		return err
 	}
 
 	for _, board := range boards {
 		for _, query := range board.Queries {
-			if query.Dataset == "" {
-				// assume an unset dataset is an environment-wide query
-				query.Dataset = environmentWideDatasetSlug
-			}
-			if _, exists := g.datasets[query.Dataset]; exists {
+			_, datasetSelected := g.datasetMap[query.Dataset]
+			if datasetSelected {
 				g.Resources = append(g.Resources, terraformutils.NewResource(
 					query.QueryID,
 					query.QueryID,
