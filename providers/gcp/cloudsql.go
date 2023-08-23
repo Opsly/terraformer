@@ -52,6 +52,10 @@ func (g *CloudSQLGenerator) loadDBInstances(svc *sqladmin.Service, project strin
 		if err != nil {
 			return err
 		}
+		err = g.loadUsers(svc, dbInstance.Name, project)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -78,6 +82,32 @@ func (g *CloudSQLGenerator) loadDBs(svc *sqladmin.Service, instanceName, project
 			cloudSQLAdditionalFields,
 		))
 	}
+	return nil
+}
+
+func (g *CloudSQLGenerator) loadUsers(svc *sqladmin.Service, instanceName, project string) error {
+	userService := sqladmin.NewUsersService(svc)
+	userListCall := userService.List(g.GetArgs()["project"].(string), instanceName)
+	if userList, err := userListCall.Do(); err == nil {
+		for _, user := range userList.Items {
+			g.Resources = append(g.Resources, terraformutils.NewResource(
+				user.Name,
+				user.Name,
+				"google_sql_user",
+				g.ProviderName,
+				map[string]string{
+					"instance": instanceName,
+					"project":  project,
+					"name":     user.Name,
+				},
+				cloudSQLAllowEmptyValues,
+				cloudSQLAdditionalFields,
+			))
+		}
+	} else {
+		return err
+	}
+
 	return nil
 }
 
