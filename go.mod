@@ -6,9 +6,6 @@ require (
 	cloud.google.com/go v0.110.2 // indirect
 	cloud.google.com/go/logging v1.7.0
 	cloud.google.com/go/storage v1.29.0
-	cloud.google.com/go v0.110.2 // indirect
-	cloud.google.com/go/logging v1.7.0
-	cloud.google.com/go/storage v1.29.0
 	github.com/Azure/azure-sdk-for-go v63.4.0+incompatible
 	github.com/Azure/azure-storage-blob-go v0.10.0
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
